@@ -108,7 +108,6 @@ def exctract_twitter_data(soup1):
     dictio['bookmarks']=react[3]
     dictio['views']=react[4]
     
-    
     data = pd.DataFrame(dictio)
     
     return data
@@ -188,3 +187,91 @@ def scrape_twitter_comments(url):
     driver.quit()
     print('execution en :',time.time()-start)
     return tweets_df
+
+
+def scrape_twitter_comments2(urls, path_to_save):
+    first_time_login = True
+    options = Options()
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--headless")
+    options.add_argument("--log-level=3")  # Suppresses most logs
+
+    service = Service(log_path='NUL')  # 'NUL' on Windows, '/dev/null' on Linux/Mac
+    
+    driver = webdriver.Chrome(options=options)
+
+    for url in urls:
+        print(f"Processing URL: {url}")
+        start = time.time()
+
+        tweets_df = pd.DataFrame()
+        driver.get(url)
+
+        time.sleep(20)
+
+        if first_time_login:
+            # Scroll initial
+            total_height = driver.execute_script("return document.body.scrollHeight")
+            driver.execute_script(f"window.scrollTo(0, {total_height * 10});")
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+            wait = WebDriverWait(driver, 20)
+
+            read_replies = wait.until(EC.presence_of_element_located(
+                (By.XPATH, "//a[@data-testid='logged_out_read_replies_pivot']")))
+            read_replies.click()
+
+
+            # Login
+            log = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@autocomplete='username']")))
+            log.send_keys('mana_isma@hotmail.com')  # <-- Remplace par ton email
+            log.send_keys(Keys.RETURN)
+
+            try:
+                pseudo = wait.until(EC.presence_of_element_located((By.XPATH, "//input")))
+                pseudo.send_keys('Izumiu10')  # <-- Remplace par ton pseudo
+                pseudo.send_keys(Keys.RETURN)
+            except:
+                pass
+
+            password = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@name='password']")))
+            password.send_keys('Izumiii0')  # <-- Remplace par ton mot de passe
+            password.send_keys(Keys.RETURN)
+
+            first_time_login = False
+
+            time.sleep(30)
+                
+        # Attente pour chargement des commentaires
+
+        SCROLL_PAUSE_TIME = 15
+        itera = 0
+        last_height = driver.execute_script("return document.body.scrollHeight")
+
+        while itera < 200:
+            page_content = driver.page_source
+            soup = BeautifulSoup(page_content, 'html.parser')
+
+            try:
+                df = exctract_twitter_data(soup)  # <-- Ta fonction d'extraction
+                tweets_df = pd.concat([tweets_df, df], ignore_index=True)
+            except TypeError as e:
+                print("Une erreur s'est produite :", e)
+
+            itera += 1
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(SCROLL_PAUSE_TIME)
+
+            new_height = driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                itera += 50
+            last_height = new_height
+
+
+        # Créer un nom de fichier à partir de l'URL
+        filename = path_to_save + url.split('/')[-1] + ".csv"
+        # Enregistrer le DataFrame dans un fichier CSV
+        tweets_df.to_csv(filename, index=False)
+        print(f"{filename} saved. Execution time: {time.time() - start:.2f} seconds\n")
+        
+    driver.quit()
