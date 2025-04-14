@@ -2,9 +2,14 @@ name: Preprocess on Data Change
 
 on:
   push:
+    branches:
+      - dev-feature
     paths:
       - 'data_scraped/**'
       - 'src/preprocess.py'
+  pull_request:
+    branches:
+      - dev-feature
 
 jobs:
   preprocess:
