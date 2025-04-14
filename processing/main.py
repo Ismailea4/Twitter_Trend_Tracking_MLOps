@@ -1,6 +1,7 @@
 from src.preprocess import remove_empty_files, preprocess_data
 
 
+
 if __name__ == "__main__":
     remove_empty_files("../data_scraped/", ['samsung', 'apple', 'nintendo'])
     df_tweets, df_users = preprocess_data()
