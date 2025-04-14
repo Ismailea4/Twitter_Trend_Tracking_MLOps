@@ -30,7 +30,7 @@ jobs:
 
       - name: Run preprocessing
         run: |
-          python processing/main.py
+          python -m processing.main
 
       - name: DVC Add processed data
         run: |
