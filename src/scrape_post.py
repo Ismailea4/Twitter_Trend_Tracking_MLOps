@@ -118,7 +118,7 @@ def scrape_twitter_comments(url):
     start = time.time()
     options = Options()
     options.add_argument("--window-size=1920,1080")
-    options.add_argument("--headless")  # Décommente pour exécuter sans interface graphique
+    #options.add_argument("--headless")  # Décommente pour exécuter sans interface graphique
     options.add_argument("--log-level=3")  # Suppresses most logs
 
     service = Service(log_path='NUL')  # 'NUL' on Windows, '/dev/null' on Linux/Mac
@@ -264,7 +264,7 @@ def scrape_twitter_comments2(urls, path_to_save):
 
             new_height = driver.execute_script("return document.body.scrollHeight")
             if new_height == last_height:
-                itera += 50
+                itera += 200
             last_height = new_height
 
 

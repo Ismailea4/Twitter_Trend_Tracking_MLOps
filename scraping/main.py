@@ -3,7 +3,7 @@ import os
 import glob
 from datetime import datetime
 import pandas as pd
-from scrape_post import scrape_twitter_comments2  # ou scrape_function.py
+from src.scrape_post import scrape_twitter_comments2  # ou scrape_function.py
 
 def get_urls_from_file(file_path):
     with open(file_path, 'r') as f:
@@ -18,8 +18,8 @@ def get_base_name(file_name):
 print("Scraping Twitter comments...")
 
 if __name__ == "__main__":
-    #txt_files = glob.glob("scraping/urls_*.txt")
-    txt_files = ["scraping/urls_nintendo.txt"]
+    txt_files = glob.glob("scraping/urls_*.txt")
+    #txt_files = ["scraping/urls_nintendo.txt"]
     today = datetime.today().strftime("%Y-%m-%d")
 
     for txt_file in txt_files:
@@ -28,7 +28,8 @@ if __name__ == "__main__":
 
         if urls:
             try:
-                output_dir = f"../data_scraped/{category}/{today}/"
+                output_dir = f"C:/Users/perso/Desktop/MLOPS/github_projet/Twitter_Trend_Tracking_MLOps/data_scraped/{category}/{today}/"
+                print(today)
                 os.makedirs(output_dir, exist_ok=True)
                 scrape_twitter_comments2(urls, output_dir)
 
