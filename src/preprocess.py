@@ -40,6 +40,10 @@ def preprocess_data(base_dir="../data_scraped/",
         
         for date_folder in tqdm(os.listdir(company_path), desc=f"Processing {company}"):
             date_path = os.path.join(company_path, date_folder)
+            if not os.path.exists(date_path) or not os.path.isdir(date_path):
+                print(f"Directory does not exist or is not a folder: {date_path}")
+                continue  # Skip if the path does not exist or is not a directory
+
             for csv_file in os.listdir(date_path):
                 if not csv_file.endswith(".csv"):
                     continue
