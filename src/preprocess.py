@@ -39,12 +39,7 @@ def preprocess_data(base_dir="../data_scraped/",
             date_path = os.path.join(company_path, date_folder)
             if not os.path.exists(date_path) or not os.path.isdir(date_path):
                 print(f"Directory does not exist or is not a folder: {date_path}")
-                continue  # Skip if the path does not exist or is not a directory
-            
-            # Verifie if the path is a directory
-            if not os.path.isdir(date_path):
-                print(f"Skipping non-directory: {date_path}")
-                continue
+                continue # Skip if the path does not exist or is not a directory
             
             for csv_file in os.listdir(date_path):
                 if not csv_file.endswith(".csv"):
