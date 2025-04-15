@@ -112,6 +112,6 @@ def preprocess_data(base_dir="../data_scraped/",
 if __name__ == "__main__":
     remove_empty_files("../data_scraped/", ['samsung', 'apple', 'nintendo'])
     df_tweets, df_users = preprocess_data()
-    df_tweets.to_csv("cleaned_tweet_data.csv", index=False)
-    df_users.to_csv("cleaned_user_data.csv", index=False)
+    #df_tweets.to_csv("cleaned_tweet_data.csv", index=False)
+    #df_users.to_csv("cleaned_user_data.csv", index=False)
     print("Preprocessing complete.")
