@@ -2,15 +2,10 @@ name: Preprocess on Data Change
 
 on:
   push:
-    branches:
-      - scrape2
     paths:
       - 'data_scraped/**'
       - 'src/preprocess.py'
-  pull_request:
-    branches:
-      - scrape2
-
+      
 jobs:
   preprocess:
     runs-on: ubuntu-latest
