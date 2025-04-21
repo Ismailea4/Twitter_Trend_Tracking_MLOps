@@ -118,7 +118,7 @@ def scrape_twitter_comments(url):
     start = time.time()
     options = Options()
     options.add_argument("--window-size=1920,1080")
-    #options.add_argument("--headless")  # Décommente pour exécuter sans interface graphique
+    options.add_argument("--headless")  # Décommente pour exécuter sans interface graphique
     options.add_argument("--log-level=3")  # Suppresses most logs
 
     service = Service(log_path='NUL')  # 'NUL' on Windows, '/dev/null' on Linux/Mac

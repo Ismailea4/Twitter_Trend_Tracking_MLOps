@@ -19,7 +19,7 @@ print("Scraping Twitter comments...")
 
 if __name__ == "__main__":
     txt_files = glob.glob("scraping/urls_*.txt")
-    #txt_files = ["scraping/urls_nintendo.txt"]
+    #txt_files = ["scraping/urls_samsung.txt"]
     today = datetime.today().strftime("%Y-%m-%d")
 
     for txt_file in txt_files:
