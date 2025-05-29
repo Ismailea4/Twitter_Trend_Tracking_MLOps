@@ -18,13 +18,14 @@ def remove_empty_files(base_dir, companies):
         company_path = os.path.join(base_dir, company)
         for date_folder in os.listdir(company_path):
             date_path = os.path.join(company_path, date_folder)
+            if not os.path.isdir(date_path):  # Skip if not a directory
+                continue
             for csv_file in os.listdir(date_path):
                 if csv_file.endswith(".csv"):
                     file_path = os.path.join(date_path, csv_file)
                     if os.stat(file_path).st_size <= 2:
                         os.remove(file_path)
                         print(f"Removed empty file: {file_path}")
-
 def preprocess_data(base_dir="../data_scraped/", 
                     companies=['samsung', 'apple', 'nintendo'], 
                     companies_username=['SamsungMobile','theapplehub','NintendoAmerica']):
