@@ -1,0 +1,18 @@
+pytest
+pytest-order
+pandas
+numpy
+scikit-learn
+xgboost
+tensorflow
+joblib
+mlflow
+textblob
+sentence-transformers
+selenium
+beautifulsoup4
+torch
+transformers
+bertopic
+tqm
+# Additional libraries for CI
