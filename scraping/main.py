@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
         if urls:
             try:
-                output_dir = f"C:/Users/perso/Desktop/MLOPS/github_projet/Twitter_Trend_Tracking_MLOps/data_scraped/{category}/{today}/"
+                output_dir = f"C:/Users/perso/Desktop/MLOPS/github_projet/Twitter_Trend_Tracking_MLOps/data/raw/{category}/{today}/"
                 print(today)
                 os.makedirs(output_dir, exist_ok=True)
                 scrape_twitter_comments2(urls, output_dir)

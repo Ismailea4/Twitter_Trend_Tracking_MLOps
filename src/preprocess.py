@@ -26,7 +26,7 @@ def remove_empty_files(base_dir, companies):
                     if os.stat(file_path).st_size <= 2:
                         os.remove(file_path)
                         print(f"Removed empty file: {file_path}")
-def preprocess_data(base_dir="../data_scraped/", 
+def preprocess_data(base_dir="../data/raw/", 
                     companies=['samsung', 'apple', 'nintendo'], 
                     companies_username=['SamsungMobile','theapplehub','NintendoAmerica']):
 
@@ -116,7 +116,7 @@ def preprocess_data(base_dir="../data_scraped/",
     return df_tweets, df_users
 
 if __name__ == "__main__":
-    remove_empty_files("../data_scraped/", ['samsung', 'apple', 'nintendo'])
+    remove_empty_files("../data/raw/", ['samsung', 'apple', 'nintendo'])
     df_tweets, df_users = preprocess_data()
     #df_tweets.to_csv("cleaned_tweet_data.csv", index=False)
     #df_users.to_csv("cleaned_user_data.csv", index=False)

@@ -102,7 +102,7 @@ def segment_and_save_models(df, feature_cols, output_dir="segmentation_models"):
     return segmentation_results
 
 def main():
-    tweet_data, user_data = load_data('../processing/cleaned_tweet_data.csv', '../processing/cleaned_user_data.csv')
+    tweet_data, user_data = load_data('../data/processed/cleaned_tweet_data.csv', '../data/processed/cleaned_user_data.csv')
     df = user_data.copy()
     tokenizer, model = load_bert_model()
     df = add_bert_sentiment(df, tokenizer, model)

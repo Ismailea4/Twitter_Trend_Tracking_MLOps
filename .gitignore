@@ -1,3 +1,31 @@
 .qodo
-myenv
+# Python
 __pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+myenv/
+env/
+venv/
+
+# MLflow
+mlruns/
+
+# DVC
+.dvc/
+*.dvc
+
+# Jupyter/IPython
+notebooks/.ipynb_checkpoints/
+
+# Pytest
+.pytest_cache/
+
+# VSCode/IDE
+.vscode/
+*.swp
+
+# System files
+.DS_Store
+Thumbs.db
