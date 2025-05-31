@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pandas scikit-learn numpy pytest tqdm
+          pip install pandas scikit-learn numpy pytest tqdm textblob
       - name: Run preprocessing tests
         run: pytest tests/test_processing.py
 
