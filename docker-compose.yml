@@ -1,0 +1,65 @@
+version: '3.9'
+
+services:
+  scraping:
+    build:
+      context: .
+      dockerfile: pipeline/scraping/Dockerfile
+    volumes:
+      - ./data:/app/data
+    command: python main.py
+
+  processing:
+    build:
+      context: .
+      dockerfile: pipeline/processing/Dockerfile
+    depends_on:
+      - scraping
+    volumes:
+      - ./data:/app/data
+    command: python main.py
+
+  training:
+    build:
+      context: .
+      dockerfile: pipeline/training/Dockerfile
+    depends_on:
+      - processing
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    command: python main.py
+
+  prediction:
+    build:
+      context: .
+      dockerfile: pipeline/prediction/Dockerfile
+    depends_on:
+      - training
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    command: python main.py
+
+  segmentation:
+    build:
+      context: .
+      dockerfile: pipeline/segmentation/Dockerfile
+    depends_on:
+      - processing
+    volumes:
+      - ./data:/app/data
+      - ./segmentation_models:/app/segmentation_models
+    command: python main.py
+
+  api:
+    build:
+      context: .
+      dockerfile: pipeline/api/Dockerfile
+    depends_on:
+      - training
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data

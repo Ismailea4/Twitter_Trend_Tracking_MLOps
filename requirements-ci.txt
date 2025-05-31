@@ -14,5 +14,4 @@ beautifulsoup4
 torch
 transformers
 bertopic
-tqm
-# Additional libraries for CI
+tqdm
