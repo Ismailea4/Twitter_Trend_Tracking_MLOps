@@ -21,7 +21,7 @@ try:
 except ImportError:
     SentenceTransformer = None
 
-MODEL_DIR = "/models"
+MODEL_DIR = "models"
 
 def ensure_dir(directory):
     if not os.path.exists(directory):
