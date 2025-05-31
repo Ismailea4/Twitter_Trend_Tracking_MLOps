@@ -20,7 +20,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas scikit-learn numpy pytest tqdm textblob
       - name: Run preprocessing tests
-        run: pytest -m tests.test_processing.py
+        run: pytest tests/test_processing.py
 
   training:
     runs-on: ubuntu-latest
@@ -36,7 +36,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas scikit-learn numpy pytest mlflow joblib tensorflow xgboost transformers tf-keras
       - name: Run training tests
-        run: pytest -m tests.test_training.py
+        run: pytest tests/test_training.py
 
   prediction:
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas scikit-learn numpy pytest mlflow joblib tensorflow xgboost transformers tf-keras
       - name: Run prediction tests
-        run: pytest -m tests.test_prediction.py
+        run: pytest tests/test_prediction.py
 
   segmentation:
     runs-on: ubuntu-latest
@@ -68,7 +68,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas scikit-learn numpy pytest torch joblib transformers
       - name: Run segmentation tests
-        run: pytest -m tests.test_segmentation.py
+        run: pytest tests/test_segmentation.py
 
   deploy:
     runs-on: ubuntu-latest
