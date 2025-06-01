@@ -1,0 +1,21 @@
+name: Run MLOps Pipeline Batch
+
+on:
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+  schedule:
+    - cron: '0 2 * * *'  # Runs every day at 2 AM UTC (customize as needed)
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull pipeline image from Docker Hub
+        run: docker pull ismail004/mlops-pipeline:latest
+
+      - name: Run pipeline container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/data:/app/data \
+            -v ${{ github.workspace }}/models:/app/models \
+            ismail004/mlops-pipeline:latest
