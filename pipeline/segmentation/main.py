@@ -1,9 +1,10 @@
 import os
 import pandas as pd
+import joblib
 from src.segmentation import (
     load_data,
     load_bert_model,
-    add_bert_sentiment,
+    load_or_predict_sentiment,
     encode_features,
     add_lda_topics,
     segment_and_save_models
@@ -21,7 +22,7 @@ def run_segmentation(
 
     # Sentiment analysis
     tokenizer, model = load_bert_model()
-    df = add_bert_sentiment(df, tokenizer, model)
+    df = load_or_predict_sentiment(df, tokenizer, model)
     df = encode_features(df)
     df = add_lda_topics(df, n_topics=n_topics)
 
@@ -34,7 +35,7 @@ def run_segmentation(
 
     # Assign cluster labels to each user (for each company)
     for company in df['company'].unique():
-        model_bundle = pd.read_pickle(os.path.join(output_dir, f"{company}_segmentation.pkl"))
+        model_bundle = joblib.load(os.path.join(output_dir, f"{company}_segmentation.pkl"))
         company_mask = df['company'] == company
         X = df.loc[company_mask, feature_cols]
         X_scaled = model_bundle['scaler'].transform(X)

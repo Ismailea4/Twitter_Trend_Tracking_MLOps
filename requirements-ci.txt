@@ -16,3 +16,4 @@ transformers
 bertopic
 tqdm
 tf-keras
+streamlit

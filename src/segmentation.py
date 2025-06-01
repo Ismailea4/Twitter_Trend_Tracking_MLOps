@@ -42,6 +42,27 @@ def add_bert_sentiment(df, tokenizer, model):
         print("Sentiment columns already exist, skipping prediction.")
     return df
 
+def load_or_predict_sentiment(df, tokenizer, model, cache_path="segmentation_models/sentiment_cache.csv"):
+    if os.path.exists(cache_path):
+        print(f"Loading cached sentiment from {cache_path}...")
+        cached = pd.read_csv(cache_path)
+        # Merge on a unique identifier, e.g., 'user_id' or 'text'
+        df = df.merge(cached[['text', 'bert_sentiment', 'bert_score']], on='text', how='left')
+        missing = df['bert_sentiment'].isna().sum()
+        if missing > 0:
+            print(f"{missing} texts missing sentiment, predicting for them...")
+            mask = df['bert_sentiment'].isna()
+            df.loc[mask, ['bert_sentiment', 'bert_score']] = list(
+                zip(*df.loc[mask, 'text'].apply(lambda x: predict_sentiment(x, tokenizer, model)))
+            )
+            # Update cache
+            df[['text', 'bert_sentiment', 'bert_score']].drop_duplicates().to_csv(cache_path, index=False)
+    else:
+        print("No sentiment cache found, predicting sentiment...")
+        df["bert_sentiment"], df["bert_score"] = zip(*df["text"].apply(lambda x: predict_sentiment(x, tokenizer, model)))
+        df[['text', 'bert_sentiment', 'bert_score']].drop_duplicates().to_csv(cache_path, index=False)
+    return df
+
 def encode_features(df):
     print("Encoding sentiment and company columns...")
     df['sentiment_numeric'] = df['bert_sentiment'].map({'NEGATIVE': -1, 'POSITIVE': 1})
@@ -102,10 +123,10 @@ def segment_and_save_models(df, feature_cols, output_dir="segmentation_models"):
     return segmentation_results
 
 def main():
-    tweet_data, user_data = load_data('../data/processed/cleaned_tweet_data.csv', '../data/processed/cleaned_user_data.csv')
+    tweet_data, user_data = load_data('data/processed/cleaned_tweet_data.csv', 'data/processed/cleaned_user_data.csv')
     df = user_data.copy()
     tokenizer, model = load_bert_model()
-    df = add_bert_sentiment(df, tokenizer, model)
+    df = load_or_predict_sentiment(df, tokenizer, model)
     df = encode_features(df)
     df = add_lda_topics(df, n_topics=5)
     feature_cols = ['total_comments', 'total_replies', 'total_likes', 'sentiment_numeric', 'bert_score',

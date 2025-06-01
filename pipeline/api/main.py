@@ -1,57 +1,29 @@
 import os
-from fastapi import FastAPI, Query
-from fastapi.responses import HTMLResponse
 import pandas as pd
 import matplotlib.pyplot as plt
 import io
 import base64
 
+from fastapi import FastAPI, Query
+from fastapi.responses import HTMLResponse
+
 from src.train_models import load_lstm, load_rf, load_xgb, load_xgb_with_text
 from pipeline.prediction.main import run_prediction
+from pipeline.segmentation.main import run_segmentation
 
 app = FastAPI()
 
-# Load models once at startup
+# Load models and data at startup
 lstm_model, lstm_scalers = load_lstm()
 rf_model, rf_scalers = load_rf()
 xgb_model, xgb_scalers = load_xgb()
 xgb_text_model, xgb_text_scalers, embedding_map = load_xgb_with_text()
 
-# Load tweet data once at startup
 DATA_PATH = "data/processed/cleaned_tweet_data.csv"
 df = pd.read_csv(DATA_PATH, parse_dates=['date'])
 
-@app.get("/", response_class=HTMLResponse)
-def root():
-    return """
-    <h2>MLOps Model API</h2>
-    <ul>
-        <li><a href='/forecast-ui'>Engagement Forecasting UI</a></li>
-        <li><a href='/segmentation-ui'>Customer Segmentation UI (coming soon)</a></li>
-    </ul>
-    """
-
-@app.get("/forecast-ui", response_class=HTMLResponse)
-def forecast_ui():
-    tweet_ids = df['tweet_id'].unique()
-    options = "".join([f"<option value='{tid}'>{tid}</option>" for tid in tweet_ids])
-    return f"""
-    <h2>Engagement Forecasting</h2>
-    <form action="/forecast-result" method="get">
-        <label for="tweet_id">Select Tweet ID:</label>
-        <select name="tweet_id">{options}</select>
-        <label for="days_ahead">Days Ahead:</label>
-        <input type="number" name="days_ahead" value="5" min="1" max="30"/>
-        <label for="model_type">Model:</label>
-        <select name="model_type">
-            <option value="lstm">LSTM</option>
-            <option value="rf">Random Forest</option>
-            <option value="xgb">XGBoost</option>
-            <option value="xgb_text">XGBoost+Text</option>
-        </select>
-        <input type="submit" value="Forecast"/>
-    </form>
-    """
+USER_DATA_PATH = "data/processed/cleaned_user_data.csv"
+user_df = pd.read_csv(USER_DATA_PATH)
 
 @app.get("/forecast-result", response_class=HTMLResponse)
 def forecast_result(
@@ -59,10 +31,9 @@ def forecast_result(
     days_ahead: int = Query(5),
     model_type: str = Query("lstm")
 ):
-    # Get tweet info for latest date
     tweet_df = df[df['tweet_id'] == tweet_id].sort_values('date')
     if tweet_df.empty:
-        return f"<h3>No tweet found for tweet_id {tweet_id}</h3>"
+        return "<h3>No tweet found for tweet_id {}</h3>".format(tweet_id)
 
     latest = tweet_df.iloc[-1]
     username = latest['username']
@@ -75,9 +46,7 @@ def forecast_result(
     views = latest['views']
     total_engagement = latest['total_engagement']
 
-    # Forecast
     forecast_df = run_prediction(tweet_id, days_ahead=days_ahead, model_type=model_type)
-    # Plot
     plt.figure(figsize=(8, 4))
     plt.plot(tweet_df['date'], tweet_df['total_engagement'], label='Historical', marker='o')
     plt.plot(forecast_df['date'], forecast_df['forecast'], label='Forecast', linestyle='--', marker='x')
@@ -92,7 +61,6 @@ def forecast_result(
     buf.seek(0)
     img_base64 = base64.b64encode(buf.read()).decode("utf-8")
 
-    # Render tweet-like rectangle
     tweet_html = f"""
     <div style='border:1px solid #ccc; border-radius:10px; width:400px; margin:20px auto; padding:16px; background:#f9f9f9;'>
         <div style='font-weight:bold; color:#1da1f2;'>{username}</div>
@@ -110,11 +78,61 @@ def forecast_result(
     """
 
     html = f"""
-    <h2>Engagement Forecasting Result</h2>
     <img src="data:image/png;base64,{img_base64}" style="display:block; margin:auto;"/>
     {tweet_html}
-    <div style='text-align:center; margin-top:20px;'>
-        <a href='/forecast-ui'>Back to Forecasting UI</a>
-    </div>
+    """
+    return html
+
+@app.get("/segmentation-result", response_class=HTMLResponse)
+def segmentation_result(company: str = Query(...)):
+    try:
+        df_segmented = run_segmentation(
+            tweet_path="data/processed/cleaned_tweet_data.csv",
+            user_path="data/processed/cleaned_user_data.csv",
+            output_dir="segmentation_models",
+            n_topics=5
+        )
+    except Exception as e:
+        return f"<h3>Error running segmentation pipeline: {str(e)}</h3>"
+
+    company_users = df_segmented[df_segmented['company'] == company]
+    if company_users.empty:
+        return f"<h3>No users found for company {company}</h3>"
+
+    if 'segmentation_label' not in company_users.columns:
+        return "<h3>Segmentation label not found. Please check the segmentation pipeline.</h3>"
+
+    segment_counts = company_users["segmentation_label"].value_counts().sort_index()
+    plt.figure(figsize=(6, 6))
+    plt.pie(segment_counts, labels=[f"Segment {i}" for i in segment_counts.index], autopct='%1.1f%%', startangle=140, colors=plt.cm.tab10.colors)
+    plt.title(f"User Segments for {company.capitalize()}")
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    plt.close()
+    buf.seek(0)
+    img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+
+    html_segments = ""
+    for seg in sorted(company_users["segmentation_label"].unique()):
+        seg_users = company_users[company_users["segmentation_label"] == seg]
+        usernames = ", ".join(seg_users["username"].astype(str).tolist())
+        avg_comments = seg_users["total_comments"].mean()
+        avg_replies = seg_users["total_replies"].mean()
+        avg_likes = seg_users["total_likes"].mean()
+        avg_sentiment = seg_users["avg_sentiment"].mean() if "avg_sentiment" in seg_users.columns else "-"
+        html_segments += f"""
+        <div style='border:1px solid #ccc; border-radius:8px; margin:16px; padding:12px;'>
+            <b>Segment {seg}</b><br>
+            <b>Usernames:</b> {usernames}<br>
+            <b>Avg Comments:</b> {avg_comments:.2f} |
+            <b>Avg Replies:</b> {avg_replies:.2f} |
+            <b>Avg Likes:</b> {avg_likes:.2f} |
+            <b>Avg Sentiment:</b> {avg_sentiment if avg_sentiment == '-' else f"{avg_sentiment:.2f}"}
+        </div>
+        """
+
+    html = f"""
+    <img src="data:image/png;base64,{img_base64}" style="display:block; margin:auto;"/>
+    {html_segments}
     """
     return html
