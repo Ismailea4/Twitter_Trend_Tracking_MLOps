@@ -88,5 +88,5 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mlops-pipeline:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/mlops-pipeline:latest
+          docker build -t ismail004/mlops-pipeline:latest .
+          docker push ismail004/mlops-pipeline:latest
