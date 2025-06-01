@@ -5,9 +5,10 @@ from PIL import Image
 import io
 import base64
 import re
+import os
 
 # Set your FastAPI backend URL (update if deployed elsewhere)
-API_URL = "http://localhost:8000"
+API_URL = os.environ.get("API_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="Twitter Trend Tracking", layout="centered")
 st.title("🐦 Twitter Trend Tracking Dashboard")
