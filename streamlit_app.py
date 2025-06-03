@@ -69,7 +69,7 @@ if st.button("🔮 Forecast Engagement"):
             img_match = re.search(r'src="data:image/png;base64,([^"]+)"', html)
             if img_match:
                 img_data = base64.b64decode(img_match.group(1))
-                st.image(Image.open(io.BytesIO(img_data)), caption="Forecast Plot", use_column_width=True)
+                st.image(Image.open(io.BytesIO(img_data)), caption="Forecast Plot", use_container_width =True)
             # Extract tweet info card
             tweet_html = re.search(r"(<div style='border:1px[^>]+>.+?</div>)", html, re.DOTALL)
             if tweet_html:

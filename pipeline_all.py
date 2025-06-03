@@ -5,7 +5,8 @@ from pipeline.segmentation.main import run_segmentation
 
 def main():
     print("=== Scraping ===")
-    run_scraping()
+    run_scraping(email=None, pseudo=None, password=None)  # Replace with actual credentials if needed
+    print("Scraping completed. Data saved to data/raw/")
     print("=== Preprocessing ===")
     df_tweets, df_users = run_processing()
     print("=== Training Forecasting Models ===")

@@ -14,7 +14,7 @@ def get_base_name(file_name):
     name = base.replace("urls_", "").replace(".txt", "")
     return name
 
-def run_scraping(url_files=None):
+def run_scraping(url_files=None, email=None, pseudo=None, password=None):
     """
     Scrape Twitter comments from all url files or a specific list.
     Args:
@@ -34,7 +34,7 @@ def run_scraping(url_files=None):
                 output_dir = f"data/raw/{category}/{today}/"
                 print(f"Scraping {category} to {output_dir}")
                 os.makedirs(output_dir, exist_ok=True)
-                scrape_twitter_comments2(urls, output_dir)
+                scrape_twitter_comments2(urls, output_dir, email, pseudo, password)
             except Exception as e:
                 print(f"Error scraping {category}: {e}")
         else:

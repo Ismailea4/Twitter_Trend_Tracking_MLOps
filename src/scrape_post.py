@@ -114,7 +114,16 @@ def exctract_twitter_data(soup1):
 
 #Fonction principale pour scraper les commentaires Twitter
 #Cette fonction prend en entrée une URL de tweet et renvoie un DataFrame contenant les commentaires associés à ce tweet.
-def scrape_twitter_comments(url):
+def scrape_twitter_comments(url,email, pseudo, password):
+    """ Scrape Twitter comments from a given tweet URL.
+    Args:
+        url (str): The URL of the tweet to scrape.
+        email (str): Your Twitter email for login.
+        pseudo (str): Your Twitter username for login.
+        password (str): Your Twitter password for login.
+    Returns:
+        pd.DataFrame: A DataFrame containing the scraped comments and their metadata.
+    """
     start = time.time()
     options = Options()
     options.add_argument("--window-size=1920,1080")
@@ -142,18 +151,18 @@ def scrape_twitter_comments(url):
 
     # Login
     log = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@autocomplete='username']")))
-    log.send_keys('mana_isma@hotmail.com')  # <-- Remplace par ton email
+    log.send_keys(email)  # <-- Remplace par ton email
     log.send_keys(Keys.RETURN)
 
     try:
         pseudo = wait.until(EC.presence_of_element_located((By.XPATH, "//input")))
-        pseudo.send_keys('Izumiu10')  # <-- Remplace par ton pseudo
+        pseudo.send_keys(pseudo)  # <-- Remplace par ton pseudo
         pseudo.send_keys(Keys.RETURN)
     except:
         pass
 
     password = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@name='password']")))
-    password.send_keys('Izumiii0')  # <-- Remplace par ton mot de passe
+    password.send_keys(password)  # <-- Remplace par ton mot de passe
     password.send_keys(Keys.RETURN)
 
     # Attente pour chargement des commentaires
@@ -189,7 +198,7 @@ def scrape_twitter_comments(url):
     return tweets_df
 
 
-def scrape_twitter_comments2(urls, path_to_save):
+def scrape_twitter_comments2(urls,path_to_save ,email, pseudo, password ):
     first_time_login = True
     options = Options()
     options.add_argument("--window-size=1920,1080")
@@ -224,18 +233,18 @@ def scrape_twitter_comments2(urls, path_to_save):
 
             # Login
             log = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@autocomplete='username']")))
-            log.send_keys('mana_isma@hotmail.com')  # <-- Remplace par ton email
+            log.send_keys(email)  # <-- Remplace par ton email
             log.send_keys(Keys.RETURN)
 
             try:
                 pseudo = wait.until(EC.presence_of_element_located((By.XPATH, "//input")))
-                pseudo.send_keys('Izumiu10')  # <-- Remplace par ton pseudo
+                pseudo.send_keys(pseudo)  # <-- Remplace par ton pseudo
                 pseudo.send_keys(Keys.RETURN)
             except:
                 pass
 
             password = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@name='password']")))
-            password.send_keys('Izumiii0')  # <-- Remplace par ton mot de passe
+            password.send_keys(password)  # <-- Remplace par ton mot de passe
             password.send_keys(Keys.RETURN)
 
             first_time_login = False
